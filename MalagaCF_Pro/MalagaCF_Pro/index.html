@@ -3893,17 +3893,7 @@ document.getElementById('btnDoLogin').addEventListener('click', async () => {
     btn.disabled = false;
 
     if (res.offline) {
-        // Fallback offline: usar localStorage como antes
-        const users = JSON.parse(localStorage.getItem('mcf_users') || '[]');
-        const found = users.find(u => u.email === email && u.pass === pass);
-        if (found) {
-            loginUser({ nombre: found.nombre, apellidos: found.apellidos || '', email });
-            closeModal('modalLogin');
-            showToast(`¡Bienvenido de nuevo, ${found.nombre}! (modo offline)`, 'success');
-        } else {
-            setError('loginEmail', 'loginEmailError', true);
-            document.getElementById('loginEmailError').textContent = 'Email o contraseña incorrectos';
-        }
+        showToast('Error de conexión al servidor. Asegúrate de acceder a través de localhost o tu servidor PHP.', 'error');
         return;
     }
 
@@ -3954,18 +3944,7 @@ document.getElementById('btnDoRegister').addEventListener('click', async () => {
     btn.disabled = false;
 
     if (res.offline) {
-        // Fallback offline: usar localStorage como antes
-        const users = JSON.parse(localStorage.getItem('mcf_users') || '[]');
-        if (users.find(u => u.email === email)) {
-            setError('regEmail', 'regEmailError', true);
-            document.getElementById('regEmailError').textContent = 'Este email ya está registrado';
-            return;
-        }
-        users.push({ nombre, apellidos, email, pass });
-        localStorage.setItem('mcf_users', JSON.stringify(users));
-        loginUser({ nombre, apellidos, email });
-        closeModal('modalRegister');
-        showToast(`¡Bienvenido al Málaga CF, ${nombre}! (modo offline)`, 'success');
+        showToast('Error de conexión al servidor. Asegúrate de acceder a través de localhost o tu servidor PHP.', 'error');
         return;
     }
 
