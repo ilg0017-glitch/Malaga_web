@@ -3192,10 +3192,40 @@
 // ═══════════════════════════════════════════════════
 //   APP STATE
 // ═══════════════════════════════════════════════════
+const API_BASE = 'api/auth';
 const state = {
-    user: JSON.parse(sessionStorage.getItem('mcf_user') || 'null'),
+    user: null,
     cartCount: parseInt(sessionStorage.getItem('mcf_cart') || '0')
 };
+
+// Helper para llamadas a la API
+async function apiCall(endpoint, method = 'GET', body = null) {
+    const opts = {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin'
+    };
+    if (body) opts.body = JSON.stringify(body);
+    
+    try {
+        const res = await fetch(`${API_BASE}/${endpoint}`, opts);
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        // Si no hay servidor PHP disponible, fallback a localStorage
+        console.warn('API no disponible, usando modo offline:', err.message);
+        return { error: true, offline: true, message: 'Servidor no disponible' };
+    }
+}
+
+// Cargar sesión desde el servidor al inicio
+(async function checkSession() {
+    const res = await apiCall('session.php');
+    if (res.authenticated && res.user) {
+        state.user = res.user;
+        updateAuthUI();
+    }
+})();
 
 // ═══════════════════════════════════════════════════
 //   TOAST
@@ -3342,7 +3372,7 @@ function isValidEmail(v) {
 // ═══════════════════════════════════════════════════
 //   LOGIN
 // ═══════════════════════════════════════════════════
-document.getElementById('btnDoLogin').addEventListener('click', () => {
+document.getElementById('btnDoLogin').addEventListener('click', async () => {
     const email = document.getElementById('loginEmail').value.trim();
     const pass  = document.getElementById('loginPass').value;
 
@@ -3352,25 +3382,48 @@ document.getElementById('btnDoLogin').addEventListener('click', () => {
 
     if (!ok) return;
 
-    // Simulate login (check localStorage for registered users)
-    const users = JSON.parse(localStorage.getItem('mcf_users') || '[]');
-    const found = users.find(u => u.email === email && u.pass === pass);
+    // Deshabilitar botón mientras se procesa
+    const btn = document.getElementById('btnDoLogin');
+    const originalText = btn.textContent;
+    btn.textContent = 'Entrando...';
+    btn.disabled = true;
 
-    if (found) {
-        const name = found.nombre;
-        loginUser({ nombre: name, apellidos: found.apellidos || '', email });
-        closeModal('modalLogin');
-        showToast(`¡Bienvenido de nuevo, ${name}!`, 'success');
-    } else {
-        setError('loginEmail', 'loginEmailError', true);
-        document.getElementById('loginEmailError').textContent = 'Email o contraseña incorrectos';
+    const res = await apiCall('login.php', 'POST', { email, password: pass });
+
+    btn.textContent = originalText;
+    btn.disabled = false;
+
+    if (res.offline) {
+        // Fallback offline: usar localStorage como antes
+        const users = JSON.parse(localStorage.getItem('mcf_users') || '[]');
+        const found = users.find(u => u.email === email && u.pass === pass);
+        if (found) {
+            loginUser({ nombre: found.nombre, apellidos: found.apellidos || '', email });
+            closeModal('modalLogin');
+            showToast(`¡Bienvenido de nuevo, ${found.nombre}! (modo offline)`, 'success');
+        } else {
+            setError('loginEmail', 'loginEmailError', true);
+            document.getElementById('loginEmailError').textContent = 'Email o contraseña incorrectos';
+        }
+        return;
     }
+
+    if (res.error) {
+        setError('loginEmail', 'loginEmailError', true);
+        document.getElementById('loginEmailError').textContent = res.message || 'Email o contraseña incorrectos';
+        return;
+    }
+
+    // Login exitoso
+    loginUser(res.user);
+    closeModal('modalLogin');
+    showToast(`¡Bienvenido de nuevo, ${res.user.nombre}!`, 'success');
 });
 
 // ═══════════════════════════════════════════════════
 //   REGISTER
 // ═══════════════════════════════════════════════════
-document.getElementById('btnDoRegister').addEventListener('click', () => {
+document.getElementById('btnDoRegister').addEventListener('click', async () => {
     const nombre    = document.getElementById('regNombre').value.trim();
     const apellidos = document.getElementById('regApellidos').value.trim();
     const email     = document.getElementById('regEmail').value.trim();
@@ -3388,19 +3441,49 @@ document.getElementById('btnDoRegister').addEventListener('click', () => {
     if (!terms) { showToast('Debes aceptar los términos y condiciones', 'error'); return; }
     if (!ok) return;
 
-    // Save to localStorage
-    const users = JSON.parse(localStorage.getItem('mcf_users') || '[]');
-    if (users.find(u => u.email === email)) {
-        setError('regEmail', 'regEmailError', true);
-        document.getElementById('regEmailError').textContent = 'Este email ya está registrado';
+    // Deshabilitar botón mientras se procesa
+    const btn = document.getElementById('btnDoRegister');
+    const originalText = btn.textContent;
+    btn.textContent = 'Creando cuenta...';
+    btn.disabled = true;
+
+    const res = await apiCall('register.php', 'POST', {
+        nombre, apellidos, email, password: pass
+    });
+
+    btn.textContent = originalText;
+    btn.disabled = false;
+
+    if (res.offline) {
+        // Fallback offline: usar localStorage como antes
+        const users = JSON.parse(localStorage.getItem('mcf_users') || '[]');
+        if (users.find(u => u.email === email)) {
+            setError('regEmail', 'regEmailError', true);
+            document.getElementById('regEmailError').textContent = 'Este email ya está registrado';
+            return;
+        }
+        users.push({ nombre, apellidos, email, pass });
+        localStorage.setItem('mcf_users', JSON.stringify(users));
+        loginUser({ nombre, apellidos, email });
+        closeModal('modalRegister');
+        showToast(`¡Bienvenido al Málaga CF, ${nombre}! (modo offline)`, 'success');
         return;
     }
-    users.push({ nombre, apellidos, email, pass });
-    localStorage.setItem('mcf_users', JSON.stringify(users));
 
-    loginUser({ nombre, apellidos, email });
+    if (res.error) {
+        if (res.field === 'email') {
+            setError('regEmail', 'regEmailError', true);
+            document.getElementById('regEmailError').textContent = res.message;
+        } else {
+            showToast(res.message || 'Error al crear la cuenta', 'error');
+        }
+        return;
+    }
+
+    // Registro exitoso
+    loginUser(res.user);
     closeModal('modalRegister');
-    showToast(`¡Bienvenido al Málaga CF, ${nombre}!`, 'success');
+    showToast(`¡Bienvenido al Málaga CF, ${res.user.nombre}!`, 'success');
 });
 
 // ═══════════════════════════════════════════════════
@@ -3408,7 +3491,6 @@ document.getElementById('btnDoRegister').addEventListener('click', () => {
 // ═══════════════════════════════════════════════════
 function loginUser(user) {
     state.user = user;
-    sessionStorage.setItem('mcf_user', JSON.stringify(user));
     updateAuthUI();
 }
 
@@ -3447,9 +3529,9 @@ userAvatar.addEventListener('click', e => {
 document.addEventListener('click', closeDropdown);
 userDropdown.addEventListener('click', e => e.stopPropagation());
 
-document.getElementById('btnLogout').addEventListener('click', () => {
+document.getElementById('btnLogout').addEventListener('click', async () => {
+    await apiCall('logout.php', 'POST');
     state.user = null;
-    sessionStorage.removeItem('mcf_user');
     closeDropdown();
     updateAuthUI();
     showToast('Sesión cerrada correctamente');
