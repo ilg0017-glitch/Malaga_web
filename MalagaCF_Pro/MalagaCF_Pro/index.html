@@ -1919,6 +1919,324 @@
             .player-info-grid { grid-template-columns: 1fr; }
             .ticker-wrap { display: none; }
         }
+
+        /* ══════════════════════════════════════════
+           PANEL DE USUARIO (DASHBOARD)
+        ══════════════════════════════════════════ */
+        .panel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,15,50,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1200;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .panel-overlay.open { opacity: 1; pointer-events: all; }
+
+        .panel {
+            background: #fff;
+            border-radius: 20px;
+            width: 95vw; max-width: 960px;
+            height: 85vh; max-height: 680px;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,20,60,0.35);
+            transform: scale(0.92) translateY(20px);
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .panel-overlay.open .panel { transform: scale(1) translateY(0); }
+
+        .panel-sidebar {
+            background: linear-gradient(180deg, var(--azul-deep) 0%, #001a52 100%);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .panel-sidebar-header {
+            padding: 28px 20px 24px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .panel-user-avatar {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--azul-mid), var(--celeste));
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; font-weight: 800;
+            margin: 0 auto 12px;
+            border: 3px solid rgba(255,255,255,0.25);
+        }
+        .panel-sidebar-header h3 {
+            color: #fff; font-family: var(--font-disp);
+            font-size: 1.1rem; font-weight: 700;
+        }
+        .panel-sidebar-header p {
+            color: rgba(255,255,255,0.5); font-size: 0.75rem; margin-top: 2px;
+        }
+
+        .panel-nav {
+            flex: 1; padding: 12px 10px;
+            display: flex; flex-direction: column; gap: 2px;
+        }
+        .panel-nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px;
+            border: none; background: transparent;
+            color: rgba(255,255,255,0.65);
+            font-family: var(--font-body);
+            font-size: 0.88rem; font-weight: 500;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-align: left; width: 100%;
+        }
+        .panel-nav-item:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .panel-nav-item.active {
+            color: #fff; background: rgba(91,184,245,0.18);
+            font-weight: 600;
+        }
+        .panel-nav-item i { width: 18px; text-align: center; font-size: 0.9rem; }
+        .panel-nav-divider {
+            height: 1px; background: rgba(255,255,255,0.08);
+            margin: 8px 16px;
+        }
+
+        .panel-content {
+            position: relative;
+            padding: 32px;
+            overflow-y: auto;
+            background: var(--gris-bg);
+        }
+        .panel-close {
+            position: absolute; top: 16px; right: 16px;
+            width: 36px; height: 36px;
+            background: #fff; border: 1px solid var(--gris-line);
+            border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; color: var(--texto-sec);
+            transition: all var(--transition); z-index: 5;
+        }
+        .panel-close:hover { background: var(--gris-card); color: var(--texto); }
+
+        .panel-section { display: none; }
+        .panel-section.active { display: block; }
+
+        .panel-section-title {
+            font-family: var(--font-disp); font-size: 1.8rem;
+            font-weight: 800; color: var(--texto); margin-bottom: 6px;
+        }
+        .panel-section-subtitle {
+            font-size: 0.88rem; color: var(--texto-sec); margin-bottom: 28px;
+        }
+
+        /* Panel Cards */
+        .panel-card {
+            background: #fff; border-radius: var(--radius);
+            border: 1px solid var(--gris-line);
+            padding: 24px; margin-bottom: 16px;
+        }
+        .panel-card-title {
+            font-family: var(--font-disp); font-size: 1.1rem;
+            font-weight: 700; color: var(--texto); margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .panel-card-title i { color: var(--azul); }
+
+        /* Form fields in panel */
+        .panel-form-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+            margin-bottom: 16px;
+        }
+        .panel-form-group { margin-bottom: 16px; }
+        .panel-form-group label {
+            display: block; font-size: 0.75rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            color: var(--texto-sec); margin-bottom: 6px;
+        }
+        .panel-form-group input, .panel-form-group select {
+            width: 100%; padding: 10px 14px;
+            border: 1.5px solid var(--gris-line); border-radius: 8px;
+            font-family: var(--font-body); font-size: 0.9rem;
+            color: var(--texto); background: var(--gris-bg);
+            transition: border-color var(--transition); outline: none;
+        }
+        .panel-form-group input:focus, .panel-form-group select:focus {
+            border-color: var(--azul); background: #fff;
+        }
+
+        .panel-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--azul), var(--azul-mid));
+            color: #fff; border: none; border-radius: 8px;
+            font-family: var(--font-alt); font-size: 0.85rem; font-weight: 600;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            cursor: pointer; transition: all var(--transition);
+        }
+        .panel-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,61,165,0.3); }
+        .panel-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .panel-btn-outline {
+            background: transparent; color: var(--azul);
+            border: 1.5px solid var(--azul);
+        }
+        .panel-btn-outline:hover { background: rgba(0,61,165,0.06); }
+        .panel-btn-danger {
+            background: linear-gradient(135deg, #d42b2b, #b91c1c);
+        }
+        .panel-btn-danger:hover { box-shadow: 0 6px 20px rgba(212,43,43,0.3); }
+        .panel-btn-sm { padding: 7px 14px; font-size: 0.75rem; }
+
+        /* Subscription Cards */
+        .sub-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; }
+        .sub-card {
+            background: #fff; border-radius: var(--radius);
+            border: 2px solid var(--gris-line);
+            padding: 20px; text-align: center;
+            transition: all var(--transition); cursor: pointer;
+            position: relative;
+        }
+        .sub-card:hover { border-color: var(--azul); transform: translateY(-2px); box-shadow: var(--shadow); }
+        .sub-card.selected { border-color: var(--azul); background: rgba(0,61,165,0.03); }
+        .sub-card-name {
+            font-family: var(--font-disp); font-size: 1.1rem;
+            font-weight: 700; color: var(--texto); margin-bottom: 4px;
+        }
+        .sub-card-price {
+            font-family: var(--font-disp); font-size: 2rem;
+            font-weight: 900; color: var(--azul); line-height: 1;
+        }
+        .sub-card-price small { font-size: 0.7rem; font-weight: 400; color: var(--texto-sec); }
+        .sub-card-zone {
+            font-size: 0.75rem; color: var(--texto-sec);
+            margin-top: 6px; padding-top: 8px;
+            border-top: 1px solid var(--gris-line);
+        }
+        .sub-card-desc { font-size: 0.78rem; color: var(--texto-sec); margin-top: 6px; line-height: 1.4; }
+        .sub-card-badge {
+            position: absolute; top: -8px; right: -8px;
+            background: var(--oro); color: #fff;
+            font-size: 0.65rem; font-weight: 700; padding: 3px 8px;
+            border-radius: 10px; text-transform: uppercase;
+        }
+        .sub-active-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+        }
+        .sub-active-badge.activo { background: rgba(22,163,74,0.1); color: #15803d; }
+        .sub-active-badge.pendiente { background: rgba(200,168,75,0.15); color: #8B6914; }
+        .sub-active-badge.cancelado { background: rgba(212,43,43,0.1); color: var(--rojo); }
+
+        /* Orders */
+        .order-card {
+            background: #fff; border-radius: var(--radius);
+            border: 1px solid var(--gris-line);
+            margin-bottom: 12px; overflow: hidden;
+        }
+        .order-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px;
+            cursor: pointer; transition: background var(--transition);
+        }
+        .order-header:hover { background: var(--gris-bg); }
+        .order-header-left { display: flex; align-items: center; gap: 16px; }
+        .order-id { font-family: var(--font-disp); font-weight: 700; color: var(--azul); }
+        .order-date { font-size: 0.82rem; color: var(--texto-sec); }
+        .order-header-right { display: flex; align-items: center; gap: 12px; }
+        .order-total { font-family: var(--font-disp); font-weight: 700; font-size: 1.1rem; }
+        .order-status {
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+        }
+        .order-status.pagado { background: rgba(22,163,74,0.1); color: #15803d; }
+        .order-status.pendiente { background: rgba(200,168,75,0.15); color: #8B6914; }
+        .order-status.enviado { background: rgba(0,61,165,0.1); color: var(--azul); }
+        .order-status.entregado { background: rgba(22,163,74,0.15); color: #15803d; }
+        .order-items {
+            display: none; padding: 0 20px 16px;
+            border-top: 1px solid var(--gris-line);
+        }
+        .order-items.open { display: block; }
+        .order-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gris-bg);
+        }
+        .order-item:last-child { border-bottom: none; }
+        .order-item img {
+            width: 48px; height: 48px; border-radius: 6px; object-fit: cover;
+        }
+        .order-item-name { flex: 1; font-size: 0.88rem; font-weight: 500; }
+        .order-item-qty { font-size: 0.82rem; color: var(--texto-sec); }
+        .order-item-price { font-weight: 600; }
+
+        /* Favorites Grid */
+        .fav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+        .fav-card {
+            background: #fff; border-radius: var(--radius);
+            border: 1px solid var(--gris-line);
+            overflow: hidden; transition: all var(--transition);
+        }
+        .fav-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+        .fav-card img {
+            width: 100%; height: 140px; object-fit: cover;
+        }
+        .fav-card-body { padding: 12px; }
+        .fav-card-name { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
+        .fav-card-price { font-family: var(--font-disp); font-weight: 700; color: var(--azul); }
+        .fav-card-actions { display: flex; gap: 8px; margin-top: 8px; }
+        .fav-remove {
+            padding: 5px 10px; border: 1px solid var(--gris-line);
+            background: #fff; border-radius: 6px;
+            font-size: 0.72rem; color: var(--rojo); cursor: pointer;
+            transition: all var(--transition);
+        }
+        .fav-remove:hover { background: rgba(212,43,43,0.06); border-color: var(--rojo); }
+
+        /* Empty states */
+        .panel-empty {
+            text-align: center; padding: 48px 20px;
+            color: var(--texto-sec);
+        }
+        .panel-empty i { font-size: 3rem; opacity: 0.2; margin-bottom: 16px; display: block; }
+        .panel-empty h4 { font-family: var(--font-disp); font-size: 1.3rem; color: var(--texto); margin-bottom: 6px; }
+        .panel-empty p { font-size: 0.88rem; }
+
+        .panel-loading {
+            text-align: center; padding: 40px;
+            color: var(--texto-sec); font-size: 0.9rem;
+        }
+
+        /* Responsive panel */
+        @media (max-width: 768px) {
+            .panel {
+                grid-template-columns: 1fr;
+                width: 100vw; height: 100vh;
+                max-width: none; max-height: none;
+                border-radius: 0;
+            }
+            .panel-sidebar {
+                flex-direction: row; align-items: center;
+                overflow-x: auto;
+            }
+            .panel-sidebar-header { display: none; }
+            .panel-nav {
+                flex-direction: row; padding: 8px;
+                gap: 4px; flex-wrap: nowrap;
+            }
+            .panel-nav-item {
+                padding: 8px 12px; font-size: 0.75rem;
+                white-space: nowrap;
+            }
+            .panel-nav-item span { display: none; }
+            .panel-nav-divider { display: none; }
+            .panel-content { padding: 20px; }
+            .sub-cards { grid-template-columns: 1fr; }
+            .panel-form-row { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -1987,12 +2305,12 @@
                     <strong id="dropdownName">Usuario</strong>
                 </div>
                 <ul>
-                    <li><a href="#"><i class="fas fa-user"></i> Mi perfil</a></li>
-                    <li><a href="#"><i class="fas fa-id-card"></i> Área de socio</a></li>
-                    <li><a href="#"><i class="fas fa-shopping-bag"></i> Mis pedidos</a></li>
-                    <li><a href="#"><i class="fas fa-heart"></i> Favoritos</a></li>
+                    <li><button onclick="openUserPanel('perfil')"><i class="fas fa-user"></i> Mi perfil</button></li>
+                    <li><button onclick="openUserPanel('socio')"><i class="fas fa-id-card"></i> Área de socio</button></li>
+                    <li><button onclick="openUserPanel('pedidos')"><i class="fas fa-shopping-bag"></i> Mis pedidos</button></li>
+                    <li><button onclick="openUserPanel('favoritos')"><i class="fas fa-heart"></i> Favoritos</button></li>
                     <div class="divider"></div>
-                    <li><a href="#"><i class="fas fa-cog"></i> Configuración</a></li>
+                    <li><button onclick="openUserPanel('config')"><i class="fas fa-cog"></i> Configuración</button></li>
                     <li><button class="logout-btn" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button></li>
                 </ul>
             </div>
@@ -2120,6 +2438,187 @@
      TOAST
 ════════════════════════════════ -->
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
+
+<!-- ═══════════════════════════════
+     PANEL DE USUARIO (DASHBOARD)
+════════════════════════════════ -->
+<div class="panel-overlay" id="userPanel">
+    <div class="panel">
+        <div class="panel-sidebar">
+            <div class="panel-sidebar-header">
+                <div class="panel-user-avatar" id="panelAvatar">U</div>
+                <h3 id="panelUserName">Usuario</h3>
+                <p id="panelUserEmail">email@ejemplo.com</p>
+            </div>
+            <nav class="panel-nav">
+                <button class="panel-nav-item active" data-panel="perfil">
+                    <i class="fas fa-user"></i> <span>Mi Perfil</span>
+                </button>
+                <button class="panel-nav-item" data-panel="socio">
+                    <i class="fas fa-id-card"></i> <span>Área de Socio</span>
+                </button>
+                <button class="panel-nav-item" data-panel="pedidos">
+                    <i class="fas fa-shopping-bag"></i> <span>Mis Pedidos</span>
+                </button>
+                <button class="panel-nav-item" data-panel="favoritos">
+                    <i class="fas fa-heart"></i> <span>Favoritos</span>
+                </button>
+                <div class="panel-nav-divider"></div>
+                <button class="panel-nav-item" data-panel="config">
+                    <i class="fas fa-cog"></i> <span>Configuración</span>
+                </button>
+            </nav>
+        </div>
+        <div class="panel-content">
+            <button class="panel-close" id="panelClose"><i class="fas fa-times"></i></button>
+
+            <!-- ── MI PERFIL ── -->
+            <div class="panel-section active" id="panelPerfil">
+                <h2 class="panel-section-title">Mi Perfil</h2>
+                <p class="panel-section-subtitle">Gestiona tu información personal</p>
+                <div class="panel-card">
+                    <div class="panel-card-title"><i class="fas fa-user-edit"></i> Datos personales</div>
+                    <div class="panel-form-row">
+                        <div class="panel-form-group">
+                            <label>Nombre</label>
+                            <input type="text" id="pNombre" placeholder="Tu nombre">
+                        </div>
+                        <div class="panel-form-group">
+                            <label>Apellidos</label>
+                            <input type="text" id="pApellidos" placeholder="Tus apellidos">
+                        </div>
+                    </div>
+                    <div class="panel-form-row">
+                        <div class="panel-form-group">
+                            <label>Email</label>
+                            <input type="email" id="pEmail" placeholder="email@ejemplo.com" disabled style="opacity:0.6">
+                        </div>
+                        <div class="panel-form-group">
+                            <label>Teléfono</label>
+                            <input type="tel" id="pTelefono" placeholder="+34 600 000 000">
+                        </div>
+                    </div>
+                    <div class="panel-form-row">
+                        <div class="panel-form-group">
+                            <label>DNI / NIE</label>
+                            <input type="text" id="pDni" placeholder="12345678A">
+                        </div>
+                        <div class="panel-form-group">
+                            <label>Miembro desde</label>
+                            <input type="text" id="pCreatedAt" disabled style="opacity:0.6">
+                        </div>
+                    </div>
+                    <button class="panel-btn" id="btnSaveProfile"><i class="fas fa-save"></i> Guardar cambios</button>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-card-title"><i class="fas fa-map-marker-alt"></i> Dirección de envío</div>
+                    <div class="panel-form-group">
+                        <label>Dirección</label>
+                        <input type="text" id="pDireccion" placeholder="Calle, número, piso...">
+                    </div>
+                    <div class="panel-form-row">
+                        <div class="panel-form-group">
+                            <label>Ciudad</label>
+                            <input type="text" id="pCiudad" placeholder="Málaga">
+                        </div>
+                        <div class="panel-form-group">
+                            <label>Código Postal</label>
+                            <input type="text" id="pCP" placeholder="29001">
+                        </div>
+                    </div>
+                    <div class="panel-form-group">
+                        <label>Provincia</label>
+                        <input type="text" id="pProvincia" placeholder="Málaga">
+                    </div>
+                    <button class="panel-btn" id="btnSaveAddress"><i class="fas fa-save"></i> Guardar dirección</button>
+                </div>
+            </div>
+
+            <!-- ── ÁREA DE SOCIO ── -->
+            <div class="panel-section" id="panelSocio">
+                <h2 class="panel-section-title">Área de Socio</h2>
+                <p class="panel-section-subtitle">Gestiona tu abono y disfruta de ventajas exclusivas</p>
+                <div class="panel-card">
+                    <div class="panel-card-title"><i class="fas fa-id-card"></i> Tu abono actual</div>
+                    <div id="currentSubContainer">
+                        <div class="panel-loading"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-card-title"><i class="fas fa-ticket-alt"></i> Abonos disponibles</div>
+                    <div class="sub-cards" id="subTypesContainer">
+                        <div class="panel-loading"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+                    </div>
+                    <div id="subFormContainer" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--gris-line);">
+                        <div class="panel-form-group">
+                            <label>Método de pago</label>
+                            <select id="subMetodoPago">
+                                <option value="">Selecciona método...</option>
+                                <option value="tarjeta">Tarjeta de crédito/débito</option>
+                                <option value="transferencia">Transferencia bancaria</option>
+                                <option value="domiciliacion">Domiciliación bancaria</option>
+                            </select>
+                        </div>
+                        <button class="panel-btn" id="btnSubscribe"><i class="fas fa-check"></i> Confirmar abono</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── MIS PEDIDOS ── -->
+            <div class="panel-section" id="panelPedidos">
+                <h2 class="panel-section-title">Mis Pedidos</h2>
+                <p class="panel-section-subtitle">Historial de compras en la tienda oficial</p>
+                <div id="ordersContainer">
+                    <div class="panel-loading"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+                </div>
+            </div>
+
+            <!-- ── FAVORITOS ── -->
+            <div class="panel-section" id="panelFavoritos">
+                <h2 class="panel-section-title">Favoritos</h2>
+                <p class="panel-section-subtitle">Productos que has guardado</p>
+                <div id="favoritesContainer">
+                    <div class="panel-loading"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+                </div>
+            </div>
+
+            <!-- ── CONFIGURACIÓN ── -->
+            <div class="panel-section" id="panelConfig">
+                <h2 class="panel-section-title">Configuración</h2>
+                <p class="panel-section-subtitle">Seguridad y preferencias de tu cuenta</p>
+                <div class="panel-card">
+                    <div class="panel-card-title"><i class="fas fa-lock"></i> Cambiar contraseña</div>
+                    <div class="panel-form-group">
+                        <label>Contraseña actual</label>
+                        <input type="password" id="cfgOldPass" placeholder="••••••••">
+                    </div>
+                    <div class="panel-form-row">
+                        <div class="panel-form-group">
+                            <label>Nueva contraseña</label>
+                            <input type="password" id="cfgNewPass" placeholder="Mín. 8 caracteres">
+                        </div>
+                        <div class="panel-form-group">
+                            <label>Confirmar nueva</label>
+                            <input type="password" id="cfgNewPass2" placeholder="Repite contraseña">
+                        </div>
+                    </div>
+                    <button class="panel-btn" id="btnChangePass"><i class="fas fa-key"></i> Cambiar contraseña</button>
+                </div>
+                <div class="panel-card" style="border-color: rgba(212,43,43,0.2);">
+                    <div class="panel-card-title" style="color:var(--rojo);"><i class="fas fa-exclamation-triangle"></i> Zona peligrosa</div>
+                    <p style="font-size:0.85rem; color:var(--texto-sec); margin-bottom:16px;">
+                        Eliminar tu cuenta es permanente. Se borrarán todos tus datos, pedidos y abonos.
+                    </p>
+                    <div class="panel-form-group">
+                        <label>Confirma con tu contraseña</label>
+                        <input type="password" id="cfgDeletePass" placeholder="Tu contraseña actual">
+                    </div>
+                    <button class="panel-btn panel-btn-danger" id="btnDeleteAccount"><i class="fas fa-trash"></i> Eliminar mi cuenta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- ═══════════════════════════════
      HERO
@@ -3560,19 +4059,7 @@ window.addToCart = function(btn) {
     }, 2000);
 };
 
-// Wishlist toggle
-document.querySelectorAll('.product-wish').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const icon = btn.querySelector('i');
-        if (icon.classList.contains('far')) {
-            icon.className = 'fas fa-heart';
-            btn.style.color = 'var(--rojo)';
-        } else {
-            icon.className = 'far fa-heart';
-            btn.style.color = '';
-        }
-    });
-});
+
 
 // ═══════════════════════════════════════════════════
 //   MOBILE NAV
@@ -3693,6 +4180,346 @@ document.querySelectorAll('.squad-card').forEach(card => {
     if (nameEl) {
         card.addEventListener('click', () => openPlayerModal(nameEl.textContent.trim()));
     }
+});
+
+// ═══════════════════════════════════════════════════
+//   PANEL DE USUARIO (DASHBOARD)
+// ═══════════════════════════════════════════════════
+let selectedSubTypeId = null;
+
+window.openUserPanel = function(section = 'perfil') {
+    if (!state.user) { openModal('modalLogin'); return; }
+    closeDropdown();
+    const panel = document.getElementById('userPanel');
+    panel.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    switchPanelSection(section);
+    updatePanelHeader();
+};
+
+function closeUserPanel() {
+    document.getElementById('userPanel').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+document.getElementById('panelClose').addEventListener('click', closeUserPanel);
+document.getElementById('userPanel').addEventListener('click', e => {
+    if (e.target === document.getElementById('userPanel')) closeUserPanel();
+});
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('userPanel').classList.contains('open')) closeUserPanel();
+});
+
+// Panel navigation
+document.querySelectorAll('.panel-nav-item').forEach(btn => {
+    btn.addEventListener('click', () => switchPanelSection(btn.dataset.panel));
+});
+
+function switchPanelSection(section) {
+    document.querySelectorAll('.panel-nav-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel-section').forEach(s => s.classList.remove('active'));
+    const navBtn = document.querySelector(`.panel-nav-item[data-panel="${section}"]`);
+    if (navBtn) navBtn.classList.add('active');
+    const sectionId = 'panel' + section.charAt(0).toUpperCase() + section.slice(1);
+    const sectionEl = document.getElementById(sectionId);
+    if (sectionEl) sectionEl.classList.add('active');
+
+    // Load data for section
+    if (section === 'perfil') loadProfile();
+    else if (section === 'socio') loadSubscriptions();
+    else if (section === 'pedidos') loadOrders();
+    else if (section === 'favoritos') loadFavorites();
+}
+
+function updatePanelHeader() {
+    if (!state.user) return;
+    const initials = (state.user.nombre || '').charAt(0).toUpperCase() +
+        ((state.user.apellidos || '').charAt(0) || '').toUpperCase();
+    document.getElementById('panelAvatar').textContent = initials || '?';
+    document.getElementById('panelUserName').textContent =
+        `${state.user.nombre || ''} ${state.user.apellidos || ''}`.trim();
+    document.getElementById('panelUserEmail').textContent = state.user.email || '';
+}
+
+// ── PERFIL ─────────────────────────────────────────
+async function loadProfile() {
+    const res = await apiCall('session.php');
+    if (res.offline || !res.authenticated) return;
+
+    const profRes = await apiCall('../api/user/profile.php');
+    if (profRes.error) return;
+
+    const u = profRes.user;
+    document.getElementById('pNombre').value = u.nombre || '';
+    document.getElementById('pApellidos').value = u.apellidos || '';
+    document.getElementById('pEmail').value = u.email || '';
+    document.getElementById('pTelefono').value = u.telefono || '';
+    document.getElementById('pDni').value = u.dni_nie || '';
+    document.getElementById('pCreatedAt').value = u.created_at ?
+        new Date(u.created_at).toLocaleDateString('es-ES', { year:'numeric', month:'long', day:'numeric' }) : '';
+
+    if (profRes.address) {
+        document.getElementById('pDireccion').value = profRes.address.direccion || '';
+        document.getElementById('pCiudad').value = profRes.address.ciudad || '';
+        document.getElementById('pCP').value = profRes.address.codigo_postal || '';
+        document.getElementById('pProvincia').value = profRes.address.provincia || '';
+    }
+}
+
+document.getElementById('btnSaveProfile').addEventListener('click', async () => {
+    const btn = document.getElementById('btnSaveProfile');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+    const res = await apiCall('../api/user/profile.php', 'POST', {
+        nombre: document.getElementById('pNombre').value.trim(),
+        apellidos: document.getElementById('pApellidos').value.trim(),
+        telefono: document.getElementById('pTelefono').value.trim(),
+        dni_nie: document.getElementById('pDni').value.trim(),
+        direccion: document.getElementById('pDireccion').value.trim(),
+        ciudad: document.getElementById('pCiudad').value.trim(),
+        codigo_postal: document.getElementById('pCP').value.trim(),
+        provincia: document.getElementById('pProvincia').value.trim()
+    });
+
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Guardar cambios';
+
+    if (res.error) { showToast(res.message || 'Error al guardar', 'error'); return; }
+
+    // Update state
+    state.user.nombre = document.getElementById('pNombre').value.trim();
+    state.user.apellidos = document.getElementById('pApellidos').value.trim();
+    updateAuthUI();
+    updatePanelHeader();
+    showToast('Perfil actualizado correctamente', 'success');
+});
+
+document.getElementById('btnSaveAddress').addEventListener('click', () => {
+    document.getElementById('btnSaveProfile').click();
+});
+
+// ── SUSCRIPCIONES ──────────────────────────────────
+async function loadSubscriptions() {
+    const res = await apiCall('../api/user/subscription.php');
+    if (res.offline) {
+        document.getElementById('currentSubContainer').innerHTML =
+            '<div class="panel-empty"><i class="fas fa-wifi"></i><h4>Sin conexión</h4><p>Necesitas servidor PHP para esta función</p></div>';
+        document.getElementById('subTypesContainer').innerHTML = '';
+        return;
+    }
+    if (res.error) return;
+
+    // Current subscriptions
+    const container = document.getElementById('currentSubContainer');
+    if (res.subscriptions.length === 0) {
+        container.innerHTML = '<div class="panel-empty"><i class="fas fa-id-card"></i><h4>Sin abono activo</h4><p>¡Hazte socio y disfruta de ventajas exclusivas!</p></div>';
+    } else {
+        container.innerHTML = res.subscriptions.map(s => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--gris-line);">
+                <div>
+                    <strong style="font-family:var(--font-disp); font-size:1.1rem;">${s.tipo_nombre}</strong>
+                    <div style="font-size:0.8rem; color:var(--texto-sec);">${s.zona_estadio} · Temporada ${s.season}</div>
+                    <div style="font-size:0.75rem; color:var(--texto-sec); margin-top:2px;">
+                        ${new Date(s.fecha_inicio).toLocaleDateString('es-ES')} → ${new Date(s.fecha_fin).toLocaleDateString('es-ES')}
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <span class="sub-active-badge ${s.estado}">${s.estado}</span>
+                    <div style="font-family:var(--font-disp); font-weight:700; font-size:1.2rem; color:var(--azul); margin-top:4px;">${parseFloat(s.precio).toFixed(2)} €</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Available types
+    const typesContainer = document.getElementById('subTypesContainer');
+    selectedSubTypeId = null;
+    typesContainer.innerHTML = res.types.map(t => `
+        <div class="sub-card" data-type-id="${t.id}" onclick="selectSubType(${t.id})">
+            ${t.nombre === 'Abono VIP' ? '<span class="sub-card-badge">Premium</span>' : ''}
+            <div class="sub-card-name">${t.nombre}</div>
+            <div class="sub-card-price">${parseFloat(t.precio).toFixed(0)}€<small>/temporada</small></div>
+            <div class="sub-card-zone"><i class="fas fa-map-marker-alt"></i> ${t.zona_estadio}</div>
+            <div class="sub-card-desc">${t.descripcion || ''}</div>
+        </div>
+    `).join('');
+}
+
+window.selectSubType = function(typeId) {
+    selectedSubTypeId = typeId;
+    document.querySelectorAll('.sub-card').forEach(c => c.classList.remove('selected'));
+    const card = document.querySelector(`.sub-card[data-type-id="${typeId}"]`);
+    if (card) card.classList.add('selected');
+    document.getElementById('subFormContainer').style.display = 'block';
+};
+
+document.getElementById('btnSubscribe').addEventListener('click', async () => {
+    if (!selectedSubTypeId) { showToast('Selecciona un tipo de abono', 'error'); return; }
+    const metodo = document.getElementById('subMetodoPago').value;
+    if (!metodo) { showToast('Selecciona un método de pago', 'error'); return; }
+
+    const btn = document.getElementById('btnSubscribe');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+
+    const res = await apiCall('../api/user/subscription.php', 'POST', {
+        subscription_type_id: selectedSubTypeId,
+        metodo_pago: metodo
+    });
+
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Confirmar abono';
+
+    if (res.error) { showToast(res.message, 'error'); return; }
+    showToast(res.message, 'success');
+    document.getElementById('subFormContainer').style.display = 'none';
+    loadSubscriptions();
+});
+
+// ── PEDIDOS ────────────────────────────────────────
+async function loadOrders() {
+    const container = document.getElementById('ordersContainer');
+    const res = await apiCall('../api/user/orders.php');
+
+    if (res.offline) {
+        container.innerHTML = '<div class="panel-empty"><i class="fas fa-wifi"></i><h4>Sin conexión</h4><p>Necesitas servidor PHP para esta función</p></div>';
+        return;
+    }
+    if (res.error) { container.innerHTML = '<div class="panel-empty"><i class="fas fa-exclamation-circle"></i><h4>Error</h4></div>'; return; }
+
+    if (res.orders.length === 0) {
+        container.innerHTML = '<div class="panel-empty"><i class="fas fa-shopping-bag"></i><h4>Sin pedidos todavía</h4><p>Explora nuestra tienda y haz tu primera compra</p></div>';
+        return;
+    }
+
+    container.innerHTML = res.orders.map(o => {
+        const date = new Date(o.fecha_pedido).toLocaleDateString('es-ES', { year:'numeric', month:'short', day:'numeric' });
+        const itemsHtml = (o.items || []).map(i => `
+            <div class="order-item">
+                <img src="${i.imagen_url || 'img/images (3).jpg'}" alt="${i.nombre}">
+                <div class="order-item-name">${i.nombre}</div>
+                <div class="order-item-qty">x${i.cantidad}</div>
+                <div class="order-item-price">${parseFloat(i.precio_unitario).toFixed(2)} €</div>
+            </div>
+        `).join('');
+        return `
+            <div class="order-card">
+                <div class="order-header" onclick="this.nextElementSibling.classList.toggle('open')">
+                    <div class="order-header-left">
+                        <span class="order-id">#${String(o.id).padStart(5,'0')}</span>
+                        <span class="order-date">${date}</span>
+                    </div>
+                    <div class="order-header-right">
+                        <span class="order-total">${parseFloat(o.total).toFixed(2)} €</span>
+                        <span class="order-status ${o.estado}">${o.estado}</span>
+                        <i class="fas fa-chevron-down" style="color:var(--texto-sec); font-size:0.75rem;"></i>
+                    </div>
+                </div>
+                <div class="order-items">${itemsHtml}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ── FAVORITOS ──────────────────────────────────────
+async function loadFavorites() {
+    const container = document.getElementById('favoritesContainer');
+    const res = await apiCall('../api/user/favorites.php');
+
+    if (res.offline) {
+        container.innerHTML = '<div class="panel-empty"><i class="fas fa-wifi"></i><h4>Sin conexión</h4><p>Necesitas servidor PHP para esta función</p></div>';
+        return;
+    }
+    if (res.error) return;
+
+    if (res.favorites.length === 0) {
+        container.innerHTML = '<div class="panel-empty"><i class="fas fa-heart"></i><h4>Sin favoritos</h4><p>Pulsa el corazón ♥ en los productos que te gusten</p></div>';
+        return;
+    }
+
+    container.innerHTML = '<div class="fav-grid">' + res.favorites.map(f => `
+        <div class="fav-card" data-product-id="${f.product_id}">
+            <img src="${f.imagen_url || 'img/images (3).jpg'}" alt="${f.nombre}">
+            <div class="fav-card-body">
+                <div class="fav-card-name">${f.nombre}</div>
+                <div class="fav-card-price">${parseFloat(f.precio).toFixed(2)} €</div>
+                <div class="fav-card-actions">
+                    <button class="fav-remove" onclick="removeFavorite(${f.product_id})">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('') + '</div>';
+}
+
+window.removeFavorite = async function(productId) {
+    const res = await apiCall('../api/user/favorites.php', 'DELETE', { product_id: productId });
+    if (!res.error) {
+        showToast('Eliminado de favoritos', 'success');
+        loadFavorites();
+    }
+};
+
+// Wire up product wishlist buttons to favorites API
+document.querySelectorAll('.product-wish').forEach((btn, index) => {
+    btn.addEventListener('click', async () => {
+        if (!state.user) { openModal('modalLogin'); return; }
+        const productId = index + 1; // Products are 1-indexed in DB
+        const icon = btn.querySelector('i');
+        if (icon.classList.contains('far')) {
+            const res = await apiCall('../api/user/favorites.php', 'POST', { product_id: productId });
+            if (!res.error || res.offline) {
+                icon.className = 'fas fa-heart';
+                btn.style.color = 'var(--rojo)';
+                showToast('Añadido a favoritos', 'success');
+            }
+        } else {
+            const res = await apiCall('../api/user/favorites.php', 'DELETE', { product_id: productId });
+            if (!res.error || res.offline) {
+                icon.className = 'far fa-heart';
+                btn.style.color = '';
+            }
+        }
+    });
+});
+
+// ── CONFIGURACIÓN ──────────────────────────────────
+document.getElementById('btnChangePass').addEventListener('click', async () => {
+    const oldPass = document.getElementById('cfgOldPass').value;
+    const newPass = document.getElementById('cfgNewPass').value;
+    const newPass2 = document.getElementById('cfgNewPass2').value;
+
+    if (!oldPass) { showToast('Introduce tu contraseña actual', 'error'); return; }
+    if (newPass.length < 8) { showToast('La nueva contraseña debe tener al menos 8 caracteres', 'error'); return; }
+    if (newPass !== newPass2) { showToast('Las contraseñas no coinciden', 'error'); return; }
+
+    const btn = document.getElementById('btnChangePass');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cambiando...';
+
+    const res = await apiCall('../api/user/settings.php', 'POST', {
+        action: 'change_password', old_password: oldPass, new_password: newPass
+    });
+
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-key"></i> Cambiar contraseña';
+
+    if (res.error) { showToast(res.message, 'error'); return; }
+    showToast('Contraseña cambiada correctamente', 'success');
+    document.getElementById('cfgOldPass').value = '';
+    document.getElementById('cfgNewPass').value = '';
+    document.getElementById('cfgNewPass2').value = '';
+});
+
+document.getElementById('btnDeleteAccount').addEventListener('click', async () => {
+    const pass = document.getElementById('cfgDeletePass').value;
+    if (!pass) { showToast('Introduce tu contraseña para confirmar', 'error'); return; }
+    if (!confirm('⚠️ ¿Estás seguro? Esta acción es IRREVERSIBLE. Se eliminarán TODOS tus datos.')) return;
+
+    const res = await apiCall('../api/user/settings.php', 'DELETE', { password: pass });
+
+    if (res.error) { showToast(res.message, 'error'); return; }
+
+    state.user = null;
+    closeUserPanel();
+    updateAuthUI();
+    showToast('Cuenta eliminada correctamente');
 });
 
 // ═══════════════════════════════════════════════════
