@@ -1,15 +1,11 @@
--- Migración: tabla de favoritos + campos opcionales en users
+-- Migración: campos opcionales en users + tabla favoritos
 -- Ejecutar en phpMyAdmin sobre la BD malaga_cf_db
 
--- 1. Hacer opcionales dni_nie y fecha_nacimiento
+-- 1. Hacer opcionales dni_nie y fecha_nacimiento para registro simplificado
 ALTER TABLE `users` MODIFY `dni_nie` varchar(20) DEFAULT NULL;
 ALTER TABLE `users` MODIFY `fecha_nacimiento` date DEFAULT NULL;
-ALTER TABLE `users` DROP INDEX IF EXISTS `dni_nie`;
 
--- 2. Añadir campo teléfono si no existe
--- (ya existe en la tabla original)
-
--- 3. Crear tabla de favoritos
+-- 2. Crear tabla de favoritos (usuarios <-> productos)
 CREATE TABLE IF NOT EXISTS `user_favorites` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
